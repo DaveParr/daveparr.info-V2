@@ -1,0 +1,9 @@
+# SASS
+.sass-cache/
+*.css.map
+*.sass.map
+*.scss.map
+
+# Generated stuff
+/public
+*.css
