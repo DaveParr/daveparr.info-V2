@@ -1,6 +1,6 @@
-title = "Duckquill"
+title = "DaveParr.Info"
 base_url = "https://duckquill.exozy.me"
-description = "Modern, pretty, and clean theme."
+description = "Blog and personal website of Dave Parr"
 
 compile_sass = true
 minify_html = true
@@ -32,7 +32,7 @@ animated_favicon = false
 # Tera date format (not used in comments!),
 # see https://docs.rs/chrono/0.4.31/chrono/format/strftime/index.html
 # for all available variables.
-date_format = "%d %B %Y"
+date_format = "%Y %B %d"
 # URL to issue tracker
 issues_url = "https://git.exozy.me/daudix/duckquill/issues"
 # URL to website's source code
@@ -48,8 +48,6 @@ stylesheets = [
 show_feed = true
 # Links used in the nav
 links = [
-  {url = "https://git.exozy.me/daudix/duckquill", name = "Repo"},
-  {url = "/demo", name = "Demo"},
   {url = "/blog", name = "Blog"},
 ]
 
