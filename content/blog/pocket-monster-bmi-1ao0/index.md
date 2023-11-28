@@ -129,7 +129,7 @@ pokemon %>%
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/kj2y0tn7o91vny08qggf.png)
 
 So most Pokemon are actually a little bigger than me, and a few of them
-are a lot bigger\\!
+are a lot bigger!
 We’ve also realised that some of them might just be very different to
 me, like stars, made entirely of metal or rock, or maybe even giant
 dragons? Just like in the earlier article, I’m going to pivot the data
@@ -159,7 +159,7 @@ pokemon %>%
 So it looks like I’m not quite as hefty as Pokemon that are rock, steel,
 ice, ground, fighting, dark or dragon. That makes sense. I’m also a bit
 more corporeal than fairy or ghost type. Pokemon has some really big
-bugs though\\!
+bugs though!
 
 # Game Over
 
@@ -185,10 +185,10 @@ In the `tidyverse` world we also used the optional arguments in
 `pivot_longer()` to select 2 columns to pivot on, and to drop rows we
 create that have `NA` when the Pokemon only has 1 type.
 
-Most importantly though, we created our own function, and it was easy\\!
+Most importantly though, we created our own function, and it was easy!
 The `BMI` function we created we used to make a single value,
 `Dave_BMI`, but also to make the whole `BMI` column for each Pokemon in
-the data set\\! That’s pretty cool.
+the data set! That’s pretty cool.
 
 From 2 known features, `weight` and `height` we made one single new
 measurement `BMI`. This an example of something that will come up more
@@ -197,6 +197,6 @@ engineering’.
 
 The next article will be going into how the Pokedex package is actually
 made, both in trying to design a ‘tidy’ data set, but also how to make a
-package in R\\!
+package in R!
 
 P.S. I know that `Pocket Monster` is related to the pokeballs they fit in, but that's a less fun title.
