@@ -53,7 +53,7 @@ links = [
 
 [extra.footer]
 # URL to the website without the https:// part, used for Johnvertisement leaderboard
-johnvert_ref = "daudix.exozy.me"
+johnvert_ref = ""
 # "© Title, YEAR" in the footer
 show_copyright = true
 # Johnvertisement in the footer
@@ -61,7 +61,7 @@ show_johnvert = false
 # "Powered by Zola and Duckquill" in footer
 show_powered_by = true
 # Link to website source
-show_source = true
+show_source = false
 
 # Based on https://github.com/cassidyjames/cassidyjames.github.io/blob/75cd2a202de7a1026de1ea00a4ef1d5b2675c7ff/_config.yaml#L35-L74
 #

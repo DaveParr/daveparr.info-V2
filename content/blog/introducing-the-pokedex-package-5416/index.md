@@ -42,7 +42,7 @@ pokemon %>%
   kable()
 ```
 
-| identifier | type\\_1 | type\\_2 |
+| identifier | type_1 | type_2 |
 | :--------- | :------ | :------ |
 | bulbasaur  | grass   | poison  |
 | ivysaur    | grass   | poison  |
@@ -68,7 +68,7 @@ pokemon %>%
   kable()
 ```
 
-| dual\\_type | count |
+| dual_type | count |
 | :--------- | ----: |
 | FALSE      |   405 |
 | TRUE       |   402 |
@@ -111,7 +111,7 @@ pokemon %>%
 
 ![Pokemon by secondary type](https://dev-to-uploads.s3.amazonaws.com/i/7r4iuz9whihop7b5cjrh.png)
 
-Look at all those ’mons with flying as a secondary type\\! The thing is
+Look at all those ’mons with flying as a secondary type! The thing is
 that, game-wise, the *order* of the typing doesn’t matter. We can easily
 count the occurrence of a specific type in either primary or secondary
 position with `pivot_longer`.
@@ -218,9 +218,9 @@ pokemon %>%
 ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/v6qbe0h2nh6n4vz4bnmz.png)
 
 So `flying normal` has the biggest count, with there being quite a few
-`bug flying`. That makes sense, as so many bug Pokemon have wings\\!
+`bug flying`. That makes sense, as so many bug Pokemon have wings!
 There are also lot’s of `bug poison` and `grass poison`. That makes
-sense too, as so many bugs and plants are poisonous\\! How many Pokemon
+sense too, as so many bugs and plants are poisonous! How many Pokemon
 have unique types though?
 
 ``` r
@@ -238,7 +238,7 @@ pokemon %>%
 | ----: |
 |    24 |
 
-24 Pokemon have unique dual types. Out of 807 that isn’t very many\\!
+24 Pokemon have unique dual types. Out of 807 that isn’t very many!
 Maybe these Pokemon might be particularly useful? I’ll try and work it
 out…
 
@@ -262,4 +262,4 @@ of people have played it, and even if you haven’t you probably have an
 intuition about what a Pokemon is, and what data about a Pokemon might
 make sense, and mean in context with other Pokemon. Feel free to fork
 and mess around with as you like. I hope its fun, and maybe even
-useful\\!
+useful!
