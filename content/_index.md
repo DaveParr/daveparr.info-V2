@@ -12,9 +12,7 @@
 ```
 {% end %}
 
-## Hi there 👋
-
-### I'm Dave.
+# I'm Dave
 
 I work a lot with Python and R, and am most interested on how data science can save the planet.
 

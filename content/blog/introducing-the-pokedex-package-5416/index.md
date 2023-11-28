@@ -1,11 +1,11 @@
 +++
-title = "Introducing the Pokedex package!"
+title = "Introducing the Pokedex package"
 description = "I made an R data package to make Pokemon data more usable in R"
 date = 2020-05-09
 [taxonomies]
 tags = ["R", "tidyverse", "pokemon"]
 [extra]
-toc = false
+toc = true
 +++
 
 ``` r

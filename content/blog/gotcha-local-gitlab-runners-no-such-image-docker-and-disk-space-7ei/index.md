@@ -6,6 +6,8 @@ date = 2020-01-10
 tags = ["cicd", "docker", "gitlab", "gotchas"]
 +++
 
+{% crt() %}
+
 ```
 Davids-MacBook-Pro:data-science davidparr$ gitlab-runner exec docker 'anomaly detection'
 Runtime platform                                    arch=amd64 os=darwin pid=72331 revision=a8a019e0 version=12.3.0
@@ -29,12 +31,14 @@ ERROR: Preparation failed: Error: No such image: rocker/tidyverse:latest (execut
 Will be retried in 3s ...
 ERROR: Job failed (system failure): Error: No such image: rocker/tidyverse:latest (executor_docker.go:195:0s)
 ```
-
+{% end %}
 But you _know_ the image exists. It's _definately_ a thing. Look, [it's right here](https://hub.docker.com/r/rocker/tidyverse/). I can even __RUN IT IN PRODUCTION__ so why is it not running on my machine?
 
 ![A shrugging emogi with the text: it works in production](./4t9ogf06iqphsaewwxvt.jpg)
 
 Turns out gitlab, as brilliant as I'm normally finding their CICD solution, is lying to you. The image _does_ exist, you _aren't_ mad, just not seeing the whole picture. 
+
+{% crt() %}
 
 ```
 Davids-MacBook-Pro:data-science davidparr$ docker pull rocker/tidyverse
@@ -62,6 +66,7 @@ d3acc34c6c77: Download complete
 70b803ec0e47: Downloading [==================================================\u003e]  324.8MB/324.8MB
 write /var/lib/docker/tmp/GetImageBlob686008714: no space left on device
 ```
+{% end %}
 
 _That's_ the error message we needed. It turns out that after a while, your local machines 'Sparse Image', that has all your docker images, containers, networks and registries, and also resizes it's on disk footprint as you use docker, will get filled up with old images, containers and other cruft. 
 
