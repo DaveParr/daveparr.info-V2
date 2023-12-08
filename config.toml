@@ -1,5 +1,5 @@
 title = "DaveParr.Info"
-base_url = "DaveParr.Info"
+base_url = "daveparr.info"
 description = "Blog and personal website of Dave Parr, Data Scientist and Software Engineer"
 
 compile_sass = true
