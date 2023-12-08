@@ -1,6 +1,8 @@
 +++
 title = "My GitHub profile shows my popular DEV.to posts and GitHub repos automatically"
 date = 2020-08-05
+[taxonomies]
+tags = ["R", "tidyverse", "github", "dev.to"]
 +++
 
 This is my github profile:

@@ -33,3 +33,33 @@ $glow: 0 0 0 1px color.scale($primary-color, $alpha: -95%),
     --nav-bg: #{$nav-bg-d};
   }
 }
+
+.tag {
+  border-radius: 9999px;
+  color: var(--fg-color);
+  padding: 0.25rem 0.75rem;
+  transition: var(--transition);
+  background-color: var(--fg05);
+
+  &:hover {
+    color: rgb(255, 255, 255);
+    background-color:var(--purple3);
+    background-image: radial-gradient(at 0 0, var(--primary-color) 0, transparent 50%),
+      radial-gradient(at 100% 100%, var(--primary-color) 0, transparent 50%);
+    text-decoration: none;
+  }
+
+  &::before {
+    content: "#";
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:hover {
+      color: rgba(0, 0, 0, 0.8);
+      background-color:var(--purple3);
+      background-image: radial-gradient(at 0 0, var(--primary-color) 0, transparent 50%),
+        radial-gradient(at 100% 100%, var(--primary-color) 0, transparent 50%);
+      text-decoration: none;
+    }
+  }
+}

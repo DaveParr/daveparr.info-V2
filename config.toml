@@ -1,6 +1,6 @@
 title = "DaveParr.Info"
 base_url = "https://duckquill.exozy.me"
-description = "Blog and personal website of Dave Parr"
+description = "Blog and personal website of Dave Parr, Data Scientist and Software Engineer"
 
 compile_sass = true
 minify_html = true
