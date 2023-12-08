@@ -1,5 +1,5 @@
 title = "DaveParr.Info"
-base_url = "https://duckquill.exozy.me"
+base_url = "https://develop--gilded-treacle-5d1506.netlify.app/"
 description = "Blog and personal website of Dave Parr, Data Scientist and Software Engineer"
 
 compile_sass = true

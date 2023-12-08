@@ -120,13 +120,19 @@ There were alternatives in all these choices. I think these are all totally viab
 
 I actually am using `click`, sort of. `typer` is built ontop of `click`, but to be honest I didn't really know that before I'd mostly decided. `click` looks like a really great project, but it wasn't _as_ clear how to get started.
 
+### Llama Index
+
 [run-llama/llama_index](https://github.com/run-llama/llama_index)
 
 `llama_index` is probably a great project, but I only found it late in my thinking on this project. If I start a different project it's suitable for any time soon I'm definately going to try it out as a comparison.
 
+### Faiss
+
 [facebookresearch/faiss](https://github.com/facebookresearch/faiss)
 
 I'd used `faiss` in a tutorial on vectorstores before. It didn't strike me as hugely intuitive to use or as simple to set up (it's recommended installation path is via conda). I also don't particularly like Facebook so I'm happy to use an alternative. 
+
+### OpenAI
 
 [openai/openai-python](https://github.com/openai/openai-python)
 
