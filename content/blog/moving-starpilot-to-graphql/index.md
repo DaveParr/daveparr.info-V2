@@ -1,0 +1,57 @@
++++
+title = "Moving Starpilot to GraphQL"
+description = "Making it 10x faster to read the stars"
+date = 2024-01-16
+[taxonomies]
+tags = ["python", "graphql", "langchain", "gpt4all", "chroma", "typer", "github", "llm", "vectorstore", "rag"]
+[extra]
+toc = true
++++
+
+After building [Starpilot](https://github.com/DaveParr/starpilot) at the end of last year and using it for a little. I became pretty frustrated with the time it took to create the vectorstore. Specifically, the time it took to read the relevant repo data from GitHub's REST api via [PyGithub](https://github.com/PyGithub/PyGithub). I [outlined the choices I made](@/blog/copilot-for-your-github-stars-1cep/index.md) in the original blog post, but to summarise: `PyGithub` wraps the GitHub REST api and is used to read the repos that are starred by a user on GitHub, and then pass this to a function that iterates over _each_ repo for _each_ piece of data I want to extract. I'm sure that for many (most) use cases this isn't an issue, but for getting 9 pieces of data for lists of sometimes hundreds or even thousands of repos, it's the wrong tool for the job. There is overhead to set up the connection, then execute the call, and wait for the response to come back. The total number of calls is roughly:
+
+``` txt
+9[pieces of information] * 1000[number of repos] + 1[list of user starred repos]
+```
+
+This is slow. To be fair I wasn't surprised by this. I actually expected it and just accepted it so I could get onto making the tool somewhat useful. Now I know it is useful though, it's time to optimise. For my list of 800 starred repos it takes about 20 minutes on my desktop. Luckily, I've found a way to 10x the speed of this process down to 2 minutes for the same list on the same machine using GraphQL.
+
+## How I did it
+
+### GraphQL
+
+[GraphQL](https://graphql.org/) is a query language for APIs and a runtime for fulfilling those queries with your existing data. It provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools. GraphQL is perfect for the needs of this project as:
+
+### GitHub GraphQL Explorer
+
+GitHub provides a [GraphQL api](https://docs.github.com/en/graphql). The Github GraphQL api allows you to structure a query for a specific set of information for a repo, then use that structure to return the same set of of structured information for each repo that a specific user has starred, all in one call. GitHub also provides a [GraphQL explorer](https://docs.github.com/en/graphql/overview/explorer) to help you build your queries. However after a while I found this limiting, mostly because the page renders so that only around a 3rd of the screen is the playground with a mad amount of space for the header, footer and sidebar. Therefore I installed:
+
+### Insomnia
+
+[Insomnia](https://insomnia.rest/) is a desktop editor for developing APIs. I liked it because the workspace is more fully featured, allowing you to save queries and sync them to your cloud account for storage, and handles authentication and suppliying variables. Because part of the GraphQL specification is that each API can be [_introspected_](https://graphql.org/learn/introspection/) it also behaved exactly like the GitHub Explorer and provided autocomplete, documentation and error linting for the queries I was writing. This was a huge help in getting the queries right. GitHub's GraphQL interface is HUUUUGE. With Insomnia I was able to build up the query I needed in stages, testing each part as I went (Insomnia the app, not the sleep problem). However, I still needed to integrate this into my code. Most tutorials seem to suggest that the thing to do is just take the query, wrap it in `""" myQuery here"""` and pass it to requests, but that seemed like a perfect way to accidentally break 90 lines of code with an unlintable typo. I wanted to use a python library that would allow me to build the query in a more structured way that is harder to break by accident, and also allow me to pass variables to the query. I found:
+
+### `graphql-query`
+
+[denisart/graphql-query](https://github.com/denisart/graphql-query) is a Python package to build GraphQL queries from the core abstract pieces of the GraphQL language. I found this really useful as I learnt more about GraphQL and how it's mental model is formed of fields with potentially optional arguments, nodes, edges and fragments. It also helped to make editing in VS Code directly a lot easier as it supports type hinting, so you can't put an `Argument` or `Field` in the wrong place. As I iterated over the last tweaks to the query I found I actually didn't need to go back to Insomnia as much. However, `graphql-query` doesn't actually act as a client to the GraphQL api, [it just builds the query](https://github.com/DaveParr/starpilot/blob/5c688eb70727d860ca9a0659f20fda988b5b686a/starpilot/utils/utils.py#L61-L138). For that I needed:
+
+### `gql`
+
+[gql](https://github.com/graphql-python/gql) is a Python library for handling GraphQL queries in Python through a client. This became particularly useful as a (reasonable) limitation of GitHub's GraphQL API is that when returning back a `repo` type node, you can only return up to 100 per call. Therefore I needed to paginate through the results. I would have liked it if `gql` had a way to handle this for me, but I couldn't find it if it does, so I wrote a small bit of simple logic to handle that. The slightly tricky thing about pagination on this node is that you need to handle it with a GraphQL `cursor`. This is a string that is returned with each node that you can use to tell the API where to start the next page of results from. I found that the easiest way to handle this was [to use a `while` loop](https://github.com/DaveParr/starpilot/blob/5c688eb70727d860ca9a0659f20fda988b5b686a/starpilot/utils/utils.py#L172-L184) and pass the cursor back to the query as a variable. When the query return is empty for a last cursor, the loop breaks, and the results are returned. I did debate a more complex approach that involved counting the number of expected repos first, modulo 100, and then using that to determine the number of pages to request, but I decided that was overkill for my use case.
+
+## Other tweaks
+
+Because the data that is returned from the API comes as a dict for each repo, I modified the old function that iterated over each repo to get all the data for a specific repo. This function also contained the logic to write the data to disk for iteration over by `langchain`, so it seemed a suitable change. As I'd also learnt some more about `jq` and how it is used in `langchain` I realised that instead of creating a `json` file with 2 dicts, one for `metadata {...}` and one for `content {...}` I realised I could just [write the data structure as a single dict](https://github.com/DaveParr/starpilot/blob/5c688eb70727d860ca9a0659f20fda988b5b686a/starpilot/utils/utils.py#L193-L221), and then use `jq` to [extract the data I needed](https://github.com/DaveParr/starpilot/blob/5c688eb70727d860ca9a0659f20fda988b5b686a/starpilot/utils/utils.py#L256-L277) via tha optional `metadata_func` argument in `langchain.document_loaders.JSONLoader`. I got tripped up for a while as I had mistakenly written a behaviour into `metadata_func` that effectively _re-imputed_ a `None` value into the `description` value _after_ the `format_repo()` function had taken the value _and_ key out of the file saved to disk, which was then passed to `Chroma` via the `JSONLoader`. I managed to debug that however, and then I implemented the suggestion from the helpful error message to use [`langchain.vectorstores.utils.filter_complex_metadata()`](https://github.com/DaveParr/starpilot/blob/5c688eb70727d860ca9a0659f20fda988b5b686a/starpilot/utils/utils.py#L295)  as a (slightly redundant) safeguard. I'd already got it wrong once so...
+
+## The tweaks that didn't make it
+
+A version of the GraphQL query that I used originally went the whole hog and also returned the `README.md/README.rst` from the repo. I'm certain that many of the readmes have great context that will enhance the embedding in the vectorstore, however I found that returning all that data significantly eroded the performance gains. To the extent that though I had 10x speeded up the process of reading the data from GitHub, I was now spending 10x longer generating the embedding via `langchain.embeddings.GPT4ALLEmbeddings`. I know that the OpenAI embedding model seems to be much faster from some trials I've done, but I'm not (yet) happy to migrate over as it increases the cost of running `starpilot`. However, not to the extent that it's unviable (probably still less than a cup of coffee), but I'm not sure I'm ready to commit to that yet. Maybe as I work towards building an agent architecture for `starpilot` I'll revisit this. When I do, I'll probably implement a way to summarise the use case from the readmes and strip out the things like installation instructions. That summary would then be the part used in the embedding.
+
+## Conclusion
+
+Using Github's GraphQL API has allowed me to [10x the speed of reading the data from GitHub](https://github.com/DaveParr/starpilot/commit/5c688eb70727d860ca9a0659f20fda988b5b686a). Developing for GraphQL is maybe even _less_ of a hassle than for REST APIs, as the introspection allows you to build complex queries in a more structured way with a better linting and autocomplete driven experience up front. I'm not sure that means _all_ API's should be GraphQL. It's pretty clear the benefits come when the data that is being returned (or operations being performed) are being done on data objects with a huge amount of structure. The other benefit is being able to batch up calls on that structure. The introspection aspects of it also help with learning, developer experience and good documentation, however arguably a chunk of this idea is already available on REST APIs via OpenAPI/Swagger, so it's not a unique selling point.
+
+Developing GraphQL in Python also seems pretty robust, with a number of other options I didn't include for GraphQL clients in the language ecosystem, as well as other tools that I didn't need for starpilot like GraphQL servers. I had worried it would be pretty under tooled, and that GraphQL client side was a very "JavaScript" thing to do. Luckily that wasn't the case.
+
+In the future either on this project or another I'd like to explore `graphql-query` 's support for fragments to dynamically extend the query render at call time (e.g. to include the readme data in the query based on a boolean flag in the function signature). I'd also maybe look at [`gql`'s support for creating a Domain Specific Language (DSL) for a given GraphQL schema](https://gql.readthedocs.io/en/latest/advanced/dsl_module.html). I only spotted that after I had finished my work with `graphql-query` so I didn't spend time resolving the same problem, but if I need to write more GraphQL in Python I'll definitely look at that.
+
+Hopefully this speed up will make [`starpilot`](https://github.com/DaveParr/starpilot) more approachable for a lot of people. I know I've been irritated in my own development cycle iterating over `star pilot read` and waiting for the data to come back, so at the very least I've saved myself some time and learnt a bunch in the process.
